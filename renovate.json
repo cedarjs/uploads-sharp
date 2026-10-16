@@ -12,9 +12,10 @@
       "schedule": ["before 6am on monday"]
     },
     {
-      "description": "Peer ranges say what apps can use, and are changed by hand",
+      "description": "The @cedarjs/uploads peer range says which Cedar versions apps can use, and is changed by hand",
       "matchDepTypes": ["peerDependencies"],
-      "enabled": false
+      "enabled": false,
+      "matchPackageNames": ["@cedarjs/uploads"]
     }
   ]
 }

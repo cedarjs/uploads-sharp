@@ -26,21 +26,21 @@
     "format:check": "oxfmt --check .",
     "prepack": "yarn build",
     "typecheck": "tsc --noEmit",
-    "test": "node --test --experimental-test-module-mocks"
+    "test": "node --test"
   },
   "devDependencies": {
     "@cedarjs/uploads": "8.0.0-canary.3435",
-    "@types/node": "^24",
+    "@types/node": "24.10.4",
     "oxfmt": "0.59.0",
     "sharp": "0.35.5",
-    "typescript": "7.0.2"
+    "typescript": "5.9.3"
   },
   "peerDependencies": {
     "@cedarjs/uploads": ">=8.0.0-canary.3435",
-    "sharp": "^0.35.0"
+    "sharp": "0.35.5"
   },
   "engines": {
     "node": ">=24.0.0"
   },
-  "packageManager": "yarn@4.17.1"
+  "packageManager": "yarn@4.14.1"
 }

@@ -1,9 +1,9 @@
 import { createRequire } from 'node:module'
 
-import type SharpConstructor from 'sharp'
-
 import { detectContentType, UploadError } from '@cedarjs/uploads'
 import type { DerivedFileGenerator } from '@cedarjs/uploads'
+
+import { loadSharp } from './loadSharp.ts'
 
 /** The formats `sharpVariant()` writes. */
 export type SharpVariantFormat = 'webp' | 'jpeg' | 'png' | 'avif'
@@ -86,8 +86,6 @@ const MAX_INPUT_PIXELS = 100_000_000
 
 // libvips' largest dimension for most formats
 const MAX_SIZE = 16383
-
-const require = createRequire(import.meta.url)
 
 const invalid = (message: string) => new UploadError('CONFIGURATION', message)
 
@@ -195,7 +193,7 @@ export function sharpVariant(
   // Loaded here, when the app starts, rather than on the first image: a
   // missing package, or its native library missing for this platform,
   // would otherwise fail every file asked for until resetVariants()
-  const sharp = loadSharp()
+  const sharp = loadSharp(createRequire(import.meta.url))
 
   return async ({ readSource }) => {
     const { data } = await readSource()
@@ -224,33 +222,5 @@ export function sharpVariant(
     ).toBuffer()
 
     return { data: output, mimeType: MIME_TYPES[format] }
-  }
-}
-
-/** Loads sharp, and its native library, or says how to fix it. */
-function loadSharp(): typeof SharpConstructor {
-  try {
-    require.resolve('sharp')
-  } catch (e) {
-    throw new UploadError(
-      'CONFIGURATION',
-      "sharpVariant() needs the 'sharp' package, which isn't installed. " +
-        'Add it to your api side with `yarn workspace api add sharp`, or ' +
-        'write your own generator.',
-      e,
-    )
-  }
-
-  try {
-    return require('sharp') as typeof SharpConstructor
-  } catch (e) {
-    throw new UploadError(
-      'CONFIGURATION',
-      "sharpVariant() can't load the 'sharp' package, which is installed. " +
-        'Usually its native library for this platform is missing; see ' +
-        'https://sharp.pixelplumbing.com/install. sharp says: ' +
-        (e instanceof Error ? e.message : String(e)),
-      e,
-    )
   }
 }

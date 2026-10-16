@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { describe, mock, test } from 'node:test'
+import { describe, test } from 'node:test'
 
 import sharp from 'sharp'
 
@@ -239,65 +239,5 @@ describe('sharpVariant', () => {
     // An inside image is never bigger than the input, which is capped
     sharpVariant({ width: 16383, fit: 'inside' })
     sharpVariant({ width: 10_000, height: 10_000 })
-  })
-
-  let fresh = 0
-
-  /** The error sharpVariant() throws when `createRequire()` gives `fake`. */
-  async function errorWith(fake: unknown) {
-    const mocked = mock.module('node:module', {
-      exports: { createRequire: () => fake },
-    })
-
-    try {
-      // A new copy of the module, which gets the mocked `createRequire()`
-      const { sharpVariant: withoutSharp } = (await import(
-        `./index.ts?fresh=${fresh++}`
-      )) as typeof import('./index.ts')
-
-      let error: unknown
-      try {
-        withoutSharp({ width: 64 })
-      } catch (e) {
-        error = e
-      }
-
-      assert.ok(error instanceof UploadError)
-      assert.equal(error.code, 'CONFIGURATION')
-
-      return String(error)
-    } finally {
-      mocked.restore()
-    }
-  }
-
-  test('says how to install sharp when it is missing', async () => {
-    const notFound = () => {
-      throw Object.assign(new Error("Cannot find module 'sharp'"), {
-        code: 'MODULE_NOT_FOUND',
-      })
-    }
-
-    const message = await errorWith(
-      Object.assign(notFound, { resolve: notFound }),
-    )
-
-    assert.ok(message.includes('yarn workspace api add sharp'))
-  })
-
-  test('says when sharp is installed but its native library is not', async () => {
-    const fake = Object.assign(
-      () => {
-        throw new Error(
-          'Could not load the "sharp" module using the linux-x64 runtime',
-        )
-      },
-      { resolve: () => '/app/node_modules/sharp/dist/index.cjs' },
-    )
-
-    const message = await errorWith(fake)
-
-    assert.ok(message.includes('https://sharp.pixelplumbing.com/install'))
-    assert.ok(message.includes('using the linux-x64 runtime'))
   })
 })
