@@ -1,0 +1,20 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "packageRules": [
+    {
+      "matchDatasources": ["npm"],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "Cedar canaries are published for every merge to main",
+      "matchPackageNames": ["@cedarjs/uploads"],
+      "schedule": ["before 6am on monday"]
+    },
+    {
+      "description": "Peer ranges say what apps can use, and are changed by hand",
+      "matchDepTypes": ["peerDependencies"],
+      "enabled": false
+    }
+  ]
+}

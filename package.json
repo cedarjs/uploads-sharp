@@ -1,0 +1,46 @@
+{
+  "name": "@cedarjs/uploads-sharp",
+  "version": "0.1.0",
+  "description": "Image thumbnails and resizes with sharp for Cedar's derived files",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cedarjs/uploads-sharp.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "prepack": "yarn build",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --experimental-test-module-mocks"
+  },
+  "devDependencies": {
+    "@cedarjs/uploads": "8.0.0-canary.3435",
+    "@types/node": "^24",
+    "oxfmt": "0.59.0",
+    "sharp": "0.35.5",
+    "typescript": "7.0.2"
+  },
+  "peerDependencies": {
+    "@cedarjs/uploads": ">=8.0.0-canary.3435",
+    "sharp": "^0.35.0"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "packageManager": "yarn@4.17.1"
+}
