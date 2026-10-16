@@ -103,24 +103,25 @@ Then use `thumb(164)` in `variants` instead of `sharpVariant({ width: 164 })`.
 `sharpVariant()` costs nothing. heic-decode decodes the whole image before sharp
 sees its size, so a huge HEIC uses that much memory first; for HEIC from
 untrusted sources, consider decoding it in a
-[sandboxed child process](https://cedarjs.com/docs/uploads#server-generated-files).
+[locked-down child process](#running-sharp-in-a-locked-down-child-process).
 
-## Running sharp in a sandbox
+## Running sharp in a locked-down child process
 
 `sharpVariant()` runs sharp in your API process. For images from people or
-systems you don't trust, you can run sharp in a
-[sandboxed child process](https://cedarjs.com/docs/uploads#server-generated-files)
-instead, with a generator of your own. sharp's libvips is native code: Node's
-permission model only decides whether a native addon may load at all (sharp
-needs `allowAddons: true`) and doesn't confine what it does once loaded, so for
-sharp the sandbox gives you an empty environment (none of your secrets), a
+systems you don't trust, you can run sharp in a locked-down child process with
+[`@cedarjs/locked-child`](https://github.com/cedarjs/locked-child) instead, with
+a generator of your own. sharp's libvips is native code: Node's permission model
+only decides whether a native addon may load at all (sharp needs
+`allowAddons: true`) and doesn't confine what it does once loaded, so for sharp
+the child process gives you an empty environment (none of your secrets), a
 separate process (a crash in libvips doesn't take your server down), and caps on
 its JavaScript heap, time and output size. The heap cap doesn't limit the memory
 libvips uses to decode an image; that needs an operating-system limit, such as a
 container's.
 
 The child script lives in your `api/src`, where every kind of build finds it and
-ships it with sharp, `cedar build --ud` too:
+ships it with sharp, `cedar build --ud` too with `@cedarjs/locked-child`'s Vite
+plugin (see its README):
 
 ```ts title="api/src/lib/square.child.ts"
 import sharp from 'sharp'
@@ -155,8 +156,8 @@ process.stdout.write(webp)
 import {
   createConcurrencyLimiter,
   findChildScript,
-  runSandboxedChild,
-} from '@cedarjs/api/sandbox'
+  runLockedChild,
+} from '@cedarjs/locked-child'
 import { detectContentType } from '@cedarjs/uploads'
 import type { DerivedFileGenerator } from '@cedarjs/uploads'
 
@@ -174,7 +175,7 @@ const square =
     }
 
     const result = await limit(() =>
-      runSandboxedChild({
+      runLockedChild({
         script: findChildScript(import.meta.dirname, 'square.child'),
         packages: ['sharp'],
         allowAddons: true,
@@ -202,7 +203,7 @@ const square =
 
 Then use `square(164)` in `variants` as you would
 `sharpVariant({ width: 164 })`. See
-[the sandbox's README](https://github.com/cedarjs/cedar/blob/main/packages/api/src/sandbox/README.md)
+[`@cedarjs/locked-child`'s README](https://github.com/cedarjs/locked-child#readme)
 for what it does and doesn't protect against.
 
 ## Development
