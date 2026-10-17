@@ -100,8 +100,8 @@ const invalid = (message: string) => new UploadError('CONFIGURATION', message)
  * megapixels are refused, and so is a `cover` size over 100 megapixels.
  *
  * It runs sharp in your API process. For images from untrusted sources,
- * consider a generator that runs sharp in `@cedarjs/api/sandbox` instead;
- * see "Derived files" in the uploads docs.
+ * consider a generator that runs sharp in a locked-down child process with
+ * `@cedarjs/locked-child` instead; see this package's README.
  *
  * @example
  * variants: {
