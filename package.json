@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@cedarjs/uploads": "8.0.0-canary.3435",
-    "@types/node": "24.10.4",
+    "@types/node": "24.19.2",
     "oxfmt": "0.59.0",
     "sharp": "0.35.5",
     "typescript": "7.0.2"
